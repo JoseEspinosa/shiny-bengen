@@ -1,15 +1,12 @@
 
-# This is the server logic for a Shiny web application.
-# You can find out more about building applications with Shiny here:
-#
-# http://shiny.rstudio.com
-#
+# Shiny web application for bengen results
 
+## loading libraries
 library(shiny)
 library(ggplot2)
 library (DT)
 
-source ("/Users/jespinosa/git/phecomp/lib/R/plotParamPublication.R")
+source("https://raw.githubusercontent.com/cbcrg/phecomp/master/lib/R/plotParamPublication.R")
 
 ## Reading data
 csv_file <- "https://raw.githubusercontent.com/cbcrg/bengen/master/CACHE/cache.csv"
@@ -76,7 +73,8 @@ shinyServer(function(input, output) {
                 scale_fill_manual(values=cb_palette) +
                 geom_bar(position="dodge", stat="identity") +
                 theme(axis.title.x = element_blank(), 
-                     axis.title.y = element_blank())
+                     axis.title.y = element_blank(),
+                     legend.title=element_blank())
         }
     })
     #     output$tbl_res <- renderTable({
