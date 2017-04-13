@@ -13,9 +13,15 @@ shinyUI(
 #         headerPanel("Hello Shiny!")
                
         sidebarPanel(
-            conditionalPanel(condition="input.tabs_p=='Plot'",
-#                              uiOutput("bedGraphRange_tab"),                    
-                             uiOutput("groups_tab")
+            conditionalPanel(condition="input.tabs_p=='Plot'",                    
+                             uiOutput("db_plot"),
+                             uiOutput("method_plot")
+            ),
+            conditionalPanel(condition="input.tabs_p=='Table'",                    
+                             uiOutput("name_score"),
+                             uiOutput("method"),
+                             uiOutput("database"),
+                             uiOutput("family")
             ),
             conditionalPanel(condition="input.tabs_p=='About'",
                              h4("Introduction") 
@@ -26,14 +32,15 @@ shinyUI(
             tabsetPanel(
                 tabPanel("Plot",
                          fluidRow(                  
-                             column(12,
-                                    plotOutput("bench_results", height=800),
-                                    plotOutput("legend_track", height=50),
-                                    plotOutput("envInfo", height=20))#,
-                             #                            textOutput("text1")
-                         )#,
-                         #column(3, downloadButton("all_plot_tiff", "Download snapshot"))#,
-                ),            
+                             column(12, plotOutput("bench_results"))                             
+                         )
+                ),     
+                tabPanel("Table",
+                         fluidRow(  
+                             DT::dataTableOutput("table")
+#                             column(12, tableOutput("table"))            
+                         )         
+                ),         
                 tabPanel("About",
                          HTML('<p>bengen</p>')),
                 

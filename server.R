@@ -7,6 +7,7 @@
 
 library(shiny)
 library(ggplot2)
+library (DT)
 
 source ("/Users/jespinosa/git/phecomp/lib/R/plotParamPublication.R")
 
@@ -27,39 +28,102 @@ cb_palette <- c("#999999", "#E69F00", "#56B4E9",
 ## Avoid problems if too many groups
 cb_palette <- rep (cb_palette, 10)
 
-# ggplot(bench_tbl, aes(V1, y=V5, fill=V2) ) +
+ggplot(bench_tbl, aes(V3, y=V5, fill=V2) ) +
+    scale_fill_manual(values=cb_palette) +
+    geom_bar(position="dodge", stat="identity") +
+    theme(axis.title.x = element_blank(), #strip.background = element_blank(),
+          axis.title.y = element_blank(),
+          legend.position="none", strip.text.x = element_blank()) #+
+#     facet_wrap(~V)
+    
+# ggplot(selected_data(), aes(V3, y=V5, fill=V2) ) +
+#     scale_fill_manual(values=cb_palette) +
 #     geom_bar(position="dodge", stat="identity")
 
 shinyServer(function(input, output) {
-#     output$bedGraphRange_tab <- renderUI({
-#         sliderInput("bedGraphRange", label = h4("Data range:"), 
-#                     min = 0, max = 1000, 
-#                     value = c(10, 100), 
-#                     step= 1)
+    ## Plot tab
+#     output$score_plot <- renderUI({
+#         checkboxGroupInput( "score_plot", label = h4("Score function:"), 
+#                             choices = unique(bench_tbl$V3), 
+#                             selected = unique(bench_tbl$V3))
+#         
 #     })
-    output$groups_tab <- renderUI({
-        checkboxGroupInput( "groups", label = h4("Groups to render:"), 
+    output$method_plot <- renderUI({
+        checkboxGroupInput( "method_plot", label = h4("Method:"), 
+                            choices = unique(bench_tbl$V2), 
+                            selected = unique(bench_tbl$V2))
+        
+    })
+    output$db_plot <- renderUI({
+        checkboxGroupInput( "db_plot", label = h4("Database:"), 
                             choices = unique(bench_tbl$V3), 
                             selected = unique(bench_tbl$V3))
         
     })
+    
     # Combine the selected variables into a new data frame
     selected_data <- reactive({
-        if(!is.null(input$groups)) {
-            bench_tbl <- subset(bench_tbl, V3 %in% input$groups)
-        }        
+        if(!is.null(input$method_plot)) {
+            bench_tbl <- subset(bench_tbl, V2 %in% input$method_plot)
+        }
+        if(!is.null(input$db_plot)) {
+            bench_tbl <- subset(bench_tbl, V3 %in% input$db_plot)
+        }      
     })
     output$bench_results <- renderPlot({
-        if(!is.null(input$groups)) {
+        if(!is.null(selected_data())) {
             ggplot(selected_data(), aes(V3, y=V5, fill=V2) ) +
-                   scale_fill_manual(values=cb_palette) +
-                   geom_bar(position="dodge", stat="identity")
+                scale_fill_manual(values=cb_palette) +
+                geom_bar(position="dodge", stat="identity") +
+                theme(axis.title.x = element_blank(), 
+                     axis.title.y = element_blank())
         }
     })
-#   output$tbl_res <- renderTable({
-    #     as.data.frame(dfFileEnv_range())
-    #     as.data.frame(dfFilePhases_range())
-#     as.data.frame(dfFilePhases_range()$ranges_p)    
-#   })
-
+    #     output$tbl_res <- renderTable({
+    #         as.data.frame(selected_data())    
+    #     })
+    
+    ##############
+    ## Table tab
+    output$name_score <- renderUI({
+        selectInput("name_score", 
+                    "Name score:",
+                    c("All",
+                    unique(as.character(bench_tbl$V1))))                    
+    })
+    output$method <- renderUI({
+        selectInput("method", 
+                    "Method:",
+                    c("All",
+                      unique(as.character(bench_tbl$V2))))                    
+    })
+    output$database <- renderUI({
+        selectInput("database", 
+                    "Database:",
+                    c("All",
+                      unique(as.character(bench_tbl$V3))))                    
+    })
+    output$family <- renderUI({
+        selectInput("family", 
+                    "Family:",
+                    c("All",
+                      unique(as.character(bench_tbl$V4))))                    
+    })
+    
+    output$table <- DT::renderDataTable(DT::datatable({
+        data <- bench_tbl
+        if (input$name_score != "All") {
+            data <- data[data$V1 == input$name_score,]
+        }
+        if (input$method != "All") {
+            data <- data[data$V2 == input$method,]
+        }
+        if (input$database != "All") {
+            data <- data[data$V3 == input$database,]
+        }
+        if (input$family != "All") {
+            data <- data[data$V4 == input$family,]
+        }
+        data
+    }))
 })
