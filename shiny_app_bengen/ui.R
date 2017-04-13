@@ -24,15 +24,15 @@ shinyUI(
                              uiOutput("family")
             ),
             conditionalPanel(condition="input.tabs_p=='About'",
-                             h4("Introduction") 
+                             h4("bengen is fucking good!!!") 
             )
         ),
         
         mainPanel(
             tabsetPanel(
-                tabPanel("Plot",
+                tabPanel("Plot", 
                          fluidRow(                  
-                             column(12, plotOutput("bench_results"))                             
+                             column(12, plotOutput("bench_results", height=800))                             
                          )
                 ),     
                 tabPanel("Table",

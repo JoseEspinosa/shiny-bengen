@@ -6,7 +6,9 @@ library(shiny)
 library(ggplot2)
 library (DT)
 
-source("https://raw.githubusercontent.com/cbcrg/phecomp/master/lib/R/plotParamPublication.R")
+# source("https://raw.githubusercontent.com/cbcrg/phecomp/master/lib/R/plotParamPublication.R")
+
+source("https://raw.githubusercontent.com/cbcrg/mwm/master/lib/R/plot_param_public.R")
 
 ## Reading data
 csv_file <- "https://raw.githubusercontent.com/cbcrg/bengen/master/CACHE/cache.csv"
@@ -29,9 +31,10 @@ ggplot(bench_tbl, aes(V3, y=V5, fill=V2) ) +
     scale_fill_manual(values=cb_palette) +
     geom_bar(position="dodge", stat="identity") +
     theme(axis.title.x = element_blank(), #strip.background = element_blank(),
-          axis.title.y = element_blank(),
-          legend.position="none", strip.text.x = element_blank()) #+
-#     facet_wrap(~V)
+          axis.title.y = element_blank()) +
+#           legend.position="none")+
+          #, strip.text.x = element_blank()) +
+          facet_wrap(~V1)
     
 # ggplot(selected_data(), aes(V3, y=V5, fill=V2) ) +
 #     scale_fill_manual(values=cb_palette) +
@@ -74,7 +77,9 @@ shinyServer(function(input, output) {
                 geom_bar(position="dodge", stat="identity") +
                 theme(axis.title.x = element_blank(), 
                      axis.title.y = element_blank(),
-                     legend.title=element_blank())
+                     legend.title=element_blank(),
+                     axis.text.x = element_text(angle = 45, hjust = 1)) +
+                facet_grid(V1~.)
         }
     })
     #     output$tbl_res <- renderTable({
